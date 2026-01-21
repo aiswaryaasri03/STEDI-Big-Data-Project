@@ -38,7 +38,7 @@ SharewithResearch_node1768979592363 = sparkSqlQuery(glueContext, query = SqlQuer
 
 # Script generated for node Customer Trusted
 EvaluateDataQuality().process_rows(frame=SharewithResearch_node1768979592363, ruleset=DEFAULT_DATA_QUALITY_RULESET, publishing_options={"dataQualityEvaluationContext": "EvaluateDataQuality_node1768979363798", "enableDataQualityResultsPublishing": True}, additional_options={"dataQualityResultsPublishing.strategy": "BEST_EFFORT", "observations.scope": "ALL"})
-CustomerTrusted_node1768979595123 = glueContext.getSink(path="s3://sri-lake-house/customer/trusted/", connection_type="s3", updateBehavior="UPDATE_IN_DATABASE", partitionKeys=[], compression="snappy", enableUpdateCatalog=True, transformation_ctx="CustomerTrusted_node1768979595123")
+CustomerTrusted_node1768979595123 = glueContext.getSink(path="s3://sri-lake-house/customer/trusted/", connection_type="s3", updateBehavior="UPDATE_IN_DATABASE", partitionKeys=[], enableUpdateCatalog=True, transformation_ctx="CustomerTrusted_node1768979595123")
 CustomerTrusted_node1768979595123.setCatalogInfo(catalogDatabase="stedi-db",catalogTableName="customer_trusted")
 CustomerTrusted_node1768979595123.setFormat("json")
 CustomerTrusted_node1768979595123.writeFrame(SharewithResearch_node1768979592363)
