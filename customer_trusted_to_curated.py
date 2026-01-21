@@ -37,7 +37,9 @@ JoinQuery_node1768982382065 = Join.apply(frame1=CustomerTrusted_node176898086554
 
 # Script generated for node Drop Fields
 SqlQuery0 = '''
-select distinct customerName, email, phone, birthDay, serialNumber, registrationDate, lastUpdateDate, shareWithResearchAsOfDate, shareWithPublicAsOfDate, shareWithFriendsAsOfDate from myDataSource
+select distinct customerName, email, phone, birthDay, serialNumber, 
+registrationDate, lastUpdateDate, shareWithResearchAsOfDate, 
+shareWithPublicAsOfDate, shareWithFriendsAsOfDate from myDataSource;
 '''
 DropFields_node1768985309697 = sparkSqlQuery(glueContext, query = SqlQuery0, mapping = {"myDataSource":JoinQuery_node1768982382065}, transformation_ctx = "DropFields_node1768985309697")
 
