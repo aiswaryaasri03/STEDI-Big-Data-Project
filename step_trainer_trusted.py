@@ -5,7 +5,13 @@ from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
 from awsgluedq.transforms import EvaluateDataQuality
+from awsglue import DynamicFrame
 
+def sparkSqlQuery(glueContext, query, mapping, transformation_ctx) -> DynamicFrame:
+    for alias, frame in mapping.items():
+        frame.toDF().createOrReplaceTempView(alias)
+    result = spark.sql(query)
+    return DynamicFrame.fromDF(result, glueContext, transformation_ctx)
 args = getResolvedOptions(sys.argv, ['JOB_NAME'])
 sc = SparkContext()
 glueContext = GlueContext(sc)
@@ -27,12 +33,15 @@ CustomerCurated_node1768980866463 = glueContext.create_dynamic_frame.from_option
 StepTrainerLanding_node1768980865542 = glueContext.create_dynamic_frame.from_options(format_options={"multiLine": "false"}, connection_type="s3", format="json", connection_options={"paths": ["s3://sri-lake-house/step_trainer/landing/"], "recurse": True}, transformation_ctx="StepTrainerLanding_node1768980865542")
 
 # Script generated for node Join Query
-JoinQuery_node1768982382065 = Join.apply(frame1=CustomerCurated_node1768980866463, frame2=StepTrainerLanding_node1768980865542, keys1=["serialnumber"], keys2=["serialnumber"], transformation_ctx="JoinQuery_node1768982382065")
+SqlQuery0 = '''
+select * from customer_curated c join step_trainer_landing s on c.serialNumber = s.serialNumber
+'''
+JoinQuery_node1768988309312 = sparkSqlQuery(glueContext, query = SqlQuery0, mapping = {"customer_curated":CustomerCurated_node1768980866463, "step_trainer_landing":StepTrainerLanding_node1768980865542}, transformation_ctx = "JoinQuery_node1768988309312")
 
 # Script generated for node Step Trainer Trusted
-EvaluateDataQuality().process_rows(frame=JoinQuery_node1768982382065, ruleset=DEFAULT_DATA_QUALITY_RULESET, publishing_options={"dataQualityEvaluationContext": "EvaluateDataQuality_node1768980250568", "enableDataQualityResultsPublishing": True}, additional_options={"dataQualityResultsPublishing.strategy": "BEST_EFFORT", "observations.scope": "ALL"})
+EvaluateDataQuality().process_rows(frame=JoinQuery_node1768988309312, ruleset=DEFAULT_DATA_QUALITY_RULESET, publishing_options={"dataQualityEvaluationContext": "EvaluateDataQuality_node1768980250568", "enableDataQualityResultsPublishing": True}, additional_options={"dataQualityResultsPublishing.strategy": "BEST_EFFORT", "observations.scope": "ALL"})
 StepTrainerTrusted_node1768980871191 = glueContext.getSink(path="s3://sri-lake-house/step_trainer/trusted/", connection_type="s3", updateBehavior="UPDATE_IN_DATABASE", partitionKeys=[], enableUpdateCatalog=True, transformation_ctx="StepTrainerTrusted_node1768980871191")
 StepTrainerTrusted_node1768980871191.setCatalogInfo(catalogDatabase="stedi-db",catalogTableName="step_trainer_trusted")
 StepTrainerTrusted_node1768980871191.setFormat("json")
-StepTrainerTrusted_node1768980871191.writeFrame(JoinQuery_node1768982382065)
+StepTrainerTrusted_node1768980871191.writeFrame(JoinQuery_node1768988309312)
 job.commit()
