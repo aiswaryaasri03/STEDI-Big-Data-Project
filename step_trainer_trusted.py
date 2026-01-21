@@ -34,7 +34,8 @@ StepTrainerLanding_node1768980865542 = glueContext.create_dynamic_frame.from_opt
 
 # Script generated for node Join Query
 SqlQuery0 = '''
-select * from customer_curated c join step_trainer_landing s on c.serialNumber = s.serialNumber
+select * from customer_curated c join step_trainer_landing s 
+on c.serialNumber = s.serialNumber;
 '''
 JoinQuery_node1768988309312 = sparkSqlQuery(glueContext, query = SqlQuery0, mapping = {"customer_curated":CustomerCurated_node1768980866463, "step_trainer_landing":StepTrainerLanding_node1768980865542}, transformation_ctx = "JoinQuery_node1768988309312")
 
